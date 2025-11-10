@@ -55,14 +55,20 @@ def ingest_alarm(alarm: AlarmCreate, session: SessionDep):
     session.commit()
     session.refresh(db_alarm)
 
-    # Generate recommendation automatically (in background in production)
+    # Generate recommendation automatically using advanced rules engine
     from app.models import Recommendation
 
-    recommendation_data = RulesEngine.generate_recommendation(db_alarm)
+    recommendation_data = RulesEngine.generate_recommendation(db_alarm, session)
     if recommendation_data:
         db_recommendation = Recommendation(**recommendation_data)
         session.add(db_recommendation)
         session.commit()
+
+        # Update turbine state based on action
+        if db_recommendation.action:
+            RulesEngine.update_turbine_state(
+                turbine.id, db_recommendation.action, session
+            )
 
     return db_alarm
 

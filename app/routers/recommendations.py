@@ -120,8 +120,8 @@ def generate_recommendation_for_alarm(alarm_id: int, session: SessionDep):
     if not alarm:
         raise HTTPException(status_code=404, detail="Alarm not found")
 
-    # Generate recommendation
-    recommendation_data = RulesEngine.generate_recommendation(alarm)
+    # Generate recommendation with advanced rules
+    recommendation_data = RulesEngine.generate_recommendation(alarm, session)
     if not recommendation_data:
         raise HTTPException(
             status_code=500, detail="Failed to generate recommendation"
@@ -132,6 +132,12 @@ def generate_recommendation_for_alarm(alarm_id: int, session: SessionDep):
     session.add(db_recommendation)
     session.commit()
     session.refresh(db_recommendation)
+
+    # Update turbine state based on action
+    if db_recommendation.action:
+        RulesEngine.update_turbine_state(
+            alarm.turbine_db_id, db_recommendation.action, session
+        )
 
     return db_recommendation
 

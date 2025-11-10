@@ -5,9 +5,10 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.background_worker import start_background_worker, stop_background_worker
 from app.config import settings
 from app.db import create_db_and_tables
-from app.routers import alarms, recommendations, turbines
+from app.routers import alarms, analytics, recommendations, turbines
 from app.schemas import HealthCheck
 
 
@@ -16,12 +17,18 @@ async def lifespan(app: FastAPI):
     """
     Lifespan context manager for startup and shutdown events.
 
-    Creates database tables on startup.
+    Creates database tables on startup and starts background worker.
     """
     # Startup: Create database tables
     create_db_and_tables()
+    
+    # Start background worker for snoozed alarms
+    await start_background_worker()
+    
     yield
-    # Shutdown: Add cleanup code here if needed
+    
+    # Shutdown: Stop background worker
+    stop_background_worker()
 
 
 # Create FastAPI application
@@ -45,6 +52,7 @@ app.add_middleware(
 app.include_router(turbines.router, prefix=settings.API_V1_PREFIX)
 app.include_router(alarms.router, prefix=settings.API_V1_PREFIX)
 app.include_router(recommendations.router, prefix=settings.API_V1_PREFIX)
+app.include_router(analytics.router, prefix=settings.API_V1_PREFIX)
 
 
 @app.get("/")

@@ -24,6 +24,16 @@ class AlarmStatus(str, Enum):
     RESOLVED = "resolved"
 
 
+class RecommendationAction(str, Enum):
+    """Recommendation action types."""
+
+    RESET = "reset"
+    ESCALATE = "escalate"
+    WAIT_COOL_DOWN = "wait_cool_down"
+    SNOOZE = "snooze"
+    MANUAL_INSPECTION = "manual_inspection"
+
+
 class RecommendationPriority(str, Enum):
     """Recommendation priority levels."""
 
@@ -46,6 +56,8 @@ class Turbine(SQLModel, table=True):
     capacity_kw: float
     installation_date: Optional[datetime] = None
     is_active: bool = Field(default=True)
+    state: str = Field(default="Online", max_length=50)  # Online, Stopped, Faulted, Cooling
+    last_state_change: Optional[datetime] = Field(default_factory=datetime.utcnow)
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
@@ -54,7 +66,7 @@ class Turbine(SQLModel, table=True):
 
 
 class Alarm(SQLModel, table=True):
-    """Turbine alarm model."""
+    """Turbine alarm model (also known as FaultEvent)."""
 
     __tablename__ = "alarms"
 
@@ -67,6 +79,12 @@ class Alarm(SQLModel, table=True):
     occurred_at: datetime = Field(default_factory=datetime.utcnow, index=True)
     acknowledged_at: Optional[datetime] = None
     resolved_at: Optional[datetime] = None
+    
+    # Enhanced fields for FHP-style logic
+    resettable: bool = Field(default=True)
+    temperature_c: Optional[float] = None
+    note: Optional[str] = Field(default=None, max_length=1000)
+    
     metadata: Optional[str] = None  # JSON string for additional data
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
@@ -86,6 +104,12 @@ class Recommendation(SQLModel, table=True):
     title: str = Field(max_length=200)
     description: str = Field(max_length=1000)
     priority: RecommendationPriority = Field(default=RecommendationPriority.MEDIUM)
+    
+    # Enhanced fields for FHP-style logic
+    action: Optional[RecommendationAction] = Field(default=None)
+    rationale: Optional[str] = Field(default=None, max_length=1000)
+    snooze_until: Optional[datetime] = None  # For snoozed recommendations
+    
     action_items: Optional[str] = None  # JSON string for action items list
     estimated_downtime_hours: Optional[float] = None
     is_automated: bool = Field(default=False)

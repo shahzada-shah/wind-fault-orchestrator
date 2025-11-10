@@ -1,0 +1,356 @@
+### Wind Fault Orchestrator API - Test Requests
+### Base URL
+@baseUrl = http://127.0.0.1:8000
+@apiUrl = {{baseUrl}}/api/v1
+
+### ============================================
+### Health Check
+### ============================================
+
+### Get API Health Status
+GET {{apiUrl}}/health
+
+### ============================================
+### Turbines
+### ============================================
+
+### Register a new turbine
+POST {{apiUrl}}/turbines
+Content-Type: application/json
+
+{
+  "turbine_id": "FR-101",
+  "name": "France Turbine 101",
+  "location": "Normandy Wind Farm",
+  "model": "Vestas V90",
+  "capacity_kw": 2000,
+  "installation_date": "2022-01-15T00:00:00"
+}
+
+###
+
+### Register another turbine
+POST {{apiUrl}}/turbines
+Content-Type: application/json
+
+{
+  "turbine_id": "FR-102",
+  "name": "France Turbine 102",
+  "location": "Normandy Wind Farm",
+  "model": "Vestas V90",
+  "capacity_kw": 2000
+}
+
+###
+
+### Register a third turbine
+POST {{apiUrl}}/turbines
+Content-Type: application/json
+
+{
+  "turbine_id": "DE-201",
+  "name": "Germany Turbine 201",
+  "location": "North Sea Farm",
+  "model": "Siemens SWT-3.6",
+  "capacity_kw": 3600
+}
+
+###
+
+### Get all turbines
+GET {{apiUrl}}/turbines
+
+###
+
+### Get active turbines only
+GET {{apiUrl}}/turbines?is_active=true
+
+###
+
+### Get a specific turbine by database ID
+GET {{apiUrl}}/turbines/1
+
+###
+
+### Update a turbine
+PATCH {{apiUrl}}/turbines/1
+Content-Type: application/json
+
+{
+  "is_active": true,
+  "location": "Normandy Wind Farm - Section A"
+}
+
+###
+
+### Soft delete a turbine
+DELETE {{apiUrl}}/turbines/1
+
+### ============================================
+### Alarms / Fault Events
+### ============================================
+
+### Ingest a critical gearbox temperature alarm
+POST {{apiUrl}}/alarms
+Content-Type: application/json
+
+{
+  "turbine_id": "FR-101",
+  "alarm_code": "EM_83",
+  "alarm_description": "Gearbox temperature critical - 82.5°C",
+  "severity": "critical",
+  "metadata": "{\"temperature_c\": 82.5, \"resettable\": true}"
+}
+
+###
+
+### Ingest a high temperature alarm
+POST {{apiUrl}}/alarms
+Content-Type: application/json
+
+{
+  "turbine_id": "FR-101",
+  "alarm_code": "GEARBOX_TEMP_HIGH",
+  "alarm_description": "Gearbox temperature exceeds safe limits",
+  "severity": "high",
+  "metadata": "{\"temperature_c\": 78.0, \"resettable\": true}"
+}
+
+###
+
+### Ingest a generator vibration alarm
+POST {{apiUrl}}/alarms
+Content-Type: application/json
+
+{
+  "turbine_id": "FR-102",
+  "alarm_code": "GENERATOR_VIBRATION",
+  "alarm_description": "Abnormal vibration patterns detected",
+  "severity": "high",
+  "metadata": "{\"vibration_level\": 7.5, \"resettable\": false}"
+}
+
+###
+
+### Ingest a pitch system fault
+POST {{apiUrl}}/alarms
+Content-Type: application/json
+
+{
+  "turbine_id": "DE-201",
+  "alarm_code": "PITCH_SYSTEM_FAULT",
+  "alarm_description": "Blade pitch control not responding",
+  "severity": "high",
+  "metadata": "{\"blade_number\": 2, \"resettable\": false}"
+}
+
+###
+
+### Ingest a grid disconnect alarm
+POST {{apiUrl}}/alarms
+Content-Type: application/json
+
+{
+  "turbine_id": "FR-101",
+  "alarm_code": "GRID_DISCONNECT",
+  "alarm_description": "Lost connection to power grid",
+  "severity": "critical",
+  "metadata": "{\"grid_voltage\": 0, \"resettable\": true}"
+}
+
+###
+
+### Ingest a low wind speed notification
+POST {{apiUrl}}/alarms
+Content-Type: application/json
+
+{
+  "turbine_id": "FR-102",
+  "alarm_code": "LOW_WIND_SPEED",
+  "alarm_description": "Wind speed below cut-in threshold",
+  "severity": "low",
+  "metadata": "{\"wind_speed_ms\": 2.1}"
+}
+
+###
+
+### Ingest a temperature overheat alarm
+POST {{apiUrl}}/alarms
+Content-Type: application/json
+
+{
+  "turbine_id": "FR-101",
+  "alarm_code": "TEMP_HIGH",
+  "alarm_description": "Temperature overheat detected",
+  "severity": "critical",
+  "metadata": "{\"temperature_c\": 88.0, \"resettable\": true}"
+}
+
+###
+
+### Get all alarms
+GET {{apiUrl}}/alarms
+
+###
+
+### Get active alarms only
+GET {{apiUrl}}/alarms?status=active
+
+###
+
+### Get alarms for specific turbine
+GET {{apiUrl}}/alarms?turbine_id=FR-101
+
+###
+
+### Get alarms by code
+GET {{apiUrl}}/alarms?alarm_code=GEARBOX_TEMP_HIGH
+
+###
+
+### Get a specific alarm
+GET {{apiUrl}}/alarms/1
+
+###
+
+### Acknowledge an alarm
+POST {{apiUrl}}/alarms/1/acknowledge
+
+###
+
+### Resolve an alarm
+POST {{apiUrl}}/alarms/1/resolve
+
+###
+
+### Update alarm status manually
+PATCH {{apiUrl}}/alarms/1
+Content-Type: application/json
+
+{
+  "status": "acknowledged"
+}
+
+### ============================================
+### Recommendations
+### ============================================
+
+### Get all recommendations (sorted by priority)
+GET {{apiUrl}}/recommendations
+
+###
+
+### Get recommendations filtered by priority
+GET {{apiUrl}}/recommendations?priority=urgent
+
+###
+
+### Get recommendations for a specific alarm
+GET {{apiUrl}}/recommendations/1
+
+###
+
+### Manually generate a new recommendation for an alarm
+POST {{apiUrl}}/recommendations/1/generate
+
+###
+
+### Create a manual recommendation
+POST {{apiUrl}}/recommendations
+Content-Type: application/json
+
+{
+  "alarm_db_id": 1,
+  "title": "Manual Inspection Required",
+  "description": "Based on field engineer assessment, manual inspection is needed",
+  "priority": "high",
+  "action_items": "[\"Schedule field visit\", \"Bring thermal camera\", \"Check oil levels\"]",
+  "estimated_downtime_hours": 6.0,
+  "is_automated": false
+}
+
+###
+
+### Get a specific recommendation by ID
+GET {{apiUrl}}/recommendations/recommendation/1
+
+### ============================================
+### Analytics (Advanced)
+### ============================================
+
+### Get top fault codes
+GET {{apiUrl}}/analytics/top-faults?limit=10
+
+###
+
+### Get fault frequency for a specific alarm code
+GET {{apiUrl}}/analytics/fault-frequency?alarm_code=GEARBOX_TEMP_HIGH&days=7
+
+###
+
+### Get troubled turbines (most alarms)
+GET {{apiUrl}}/analytics/turbines/troubled?limit=5
+
+###
+
+### Get temperature trends for a turbine
+GET {{apiUrl}}/analytics/temp-trends/1?days=7
+
+### ============================================
+### Batch Operations (Useful for Testing)
+### ============================================
+
+### Create multiple alarms rapidly (oscillation testing)
+POST {{apiUrl}}/alarms
+Content-Type: application/json
+
+{
+  "turbine_id": "FR-101",
+  "alarm_code": "EM_83",
+  "alarm_description": "Oscillation test 1",
+  "severity": "major",
+  "metadata": "{\"temperature_c\": 76.0, \"resettable\": true}"
+}
+
+###
+
+### Second alarm (for oscillation - within 10 min)
+POST {{apiUrl}}/alarms
+Content-Type: application/json
+
+{
+  "turbine_id": "FR-101",
+  "alarm_code": "EM_83",
+  "alarm_description": "Oscillation test 2",
+  "severity": "major",
+  "metadata": "{\"temperature_c\": 77.0, \"resettable\": true}"
+}
+
+###
+
+### Third alarm (frequency testing)
+POST {{apiUrl}}/alarms
+Content-Type: application/json
+
+{
+  "turbine_id": "FR-101",
+  "alarm_code": "EM_83",
+  "alarm_description": "Frequency test 3",
+  "severity": "major",
+  "metadata": "{\"temperature_c\": 78.0, \"resettable\": true}"
+}
+
+###
+
+### Fourth alarm (frequency testing)
+POST {{apiUrl}}/alarms
+Content-Type: application/json
+
+{
+  "turbine_id": "FR-101",
+  "alarm_code": "EM_83",
+  "alarm_description": "Frequency test 4",
+  "severity": "major",
+  "metadata": "{\"temperature_c\": 79.0, \"resettable\": true}"
+}
+
