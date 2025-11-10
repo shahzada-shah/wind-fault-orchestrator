@@ -68,7 +68,7 @@ class AlarmBase(BaseModel):
     resettable: bool = True
     temperature_c: Optional[float] = Field(None, description="Temperature in Celsius")
     note: Optional[str] = Field(None, max_length=1000, description="Additional notes")
-    metadata: Optional[str] = Field(None, description="Additional metadata as JSON string")
+    extra_metadata: Optional[str] = Field(None, description="Additional metadata as JSON string")
 
 
 class AlarmCreate(AlarmBase):

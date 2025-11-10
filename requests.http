@@ -99,7 +99,8 @@ Content-Type: application/json
   "alarm_code": "EM_83",
   "alarm_description": "Gearbox temperature critical - 82.5°C",
   "severity": "critical",
-  "metadata": "{\"temperature_c\": 82.5, \"resettable\": true}"
+  "resettable": true,
+  "temperature_c": 82.5
 }
 
 ###
@@ -113,7 +114,8 @@ Content-Type: application/json
   "alarm_code": "GEARBOX_TEMP_HIGH",
   "alarm_description": "Gearbox temperature exceeds safe limits",
   "severity": "high",
-  "metadata": "{\"temperature_c\": 78.0, \"resettable\": true}"
+  "resettable": true,
+  "temperature_c": 78.0
 }
 
 ###
@@ -127,7 +129,7 @@ Content-Type: application/json
   "alarm_code": "GENERATOR_VIBRATION",
   "alarm_description": "Abnormal vibration patterns detected",
   "severity": "high",
-  "metadata": "{\"vibration_level\": 7.5, \"resettable\": false}"
+  "resettable": false
 }
 
 ###
@@ -141,7 +143,7 @@ Content-Type: application/json
   "alarm_code": "PITCH_SYSTEM_FAULT",
   "alarm_description": "Blade pitch control not responding",
   "severity": "high",
-  "metadata": "{\"blade_number\": 2, \"resettable\": false}"
+  "resettable": false
 }
 
 ###
@@ -155,7 +157,7 @@ Content-Type: application/json
   "alarm_code": "GRID_DISCONNECT",
   "alarm_description": "Lost connection to power grid",
   "severity": "critical",
-  "metadata": "{\"grid_voltage\": 0, \"resettable\": true}"
+  "resettable": true
 }
 
 ###
@@ -168,8 +170,7 @@ Content-Type: application/json
   "turbine_id": "FR-102",
   "alarm_code": "LOW_WIND_SPEED",
   "alarm_description": "Wind speed below cut-in threshold",
-  "severity": "low",
-  "metadata": "{\"wind_speed_ms\": 2.1}"
+  "severity": "low"
 }
 
 ###
@@ -183,7 +184,8 @@ Content-Type: application/json
   "alarm_code": "TEMP_HIGH",
   "alarm_description": "Temperature overheat detected",
   "severity": "critical",
-  "metadata": "{\"temperature_c\": 88.0, \"resettable\": true}"
+  "resettable": true,
+  "temperature_c": 88.0
 }
 
 ###
@@ -308,8 +310,9 @@ Content-Type: application/json
   "turbine_id": "FR-101",
   "alarm_code": "EM_83",
   "alarm_description": "Oscillation test 1",
-  "severity": "major",
-  "metadata": "{\"temperature_c\": 76.0, \"resettable\": true}"
+  "severity": "high",
+  "resettable": true,
+  "temperature_c": 76.0
 }
 
 ###
@@ -322,8 +325,9 @@ Content-Type: application/json
   "turbine_id": "FR-101",
   "alarm_code": "EM_83",
   "alarm_description": "Oscillation test 2",
-  "severity": "major",
-  "metadata": "{\"temperature_c\": 77.0, \"resettable\": true}"
+  "severity": "high",
+  "resettable": true,
+  "temperature_c": 77.0
 }
 
 ###
@@ -336,8 +340,9 @@ Content-Type: application/json
   "turbine_id": "FR-101",
   "alarm_code": "EM_83",
   "alarm_description": "Frequency test 3",
-  "severity": "major",
-  "metadata": "{\"temperature_c\": 78.0, \"resettable\": true}"
+  "severity": "high",
+  "resettable": true,
+  "temperature_c": 78.0
 }
 
 ###
@@ -350,7 +355,8 @@ Content-Type: application/json
   "turbine_id": "FR-101",
   "alarm_code": "EM_83",
   "alarm_description": "Frequency test 4",
-  "severity": "major",
-  "metadata": "{\"temperature_c\": 79.0, \"resettable\": true}"
+  "severity": "high",
+  "resettable": true,
+  "temperature_c": 79.0
 }
 

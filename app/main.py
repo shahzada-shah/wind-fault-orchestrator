@@ -78,9 +78,10 @@ def health_check():
     # Test database connection
     try:
         from app.db import engine
+        from sqlalchemy import text
 
         with engine.connect() as conn:
-            conn.execute("SELECT 1")
+            conn.execute(text("SELECT 1"))
     except Exception as e:
         database_status = f"error: {str(e)}"
 

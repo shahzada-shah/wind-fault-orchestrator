@@ -85,7 +85,7 @@ class Alarm(SQLModel, table=True):
     temperature_c: Optional[float] = None
     note: Optional[str] = Field(default=None, max_length=1000)
     
-    metadata: Optional[str] = None  # JSON string for additional data
+    extra_metadata: Optional[str] = None  # JSON string for additional data (renamed from metadata)
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
