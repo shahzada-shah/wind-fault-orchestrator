@@ -67,7 +67,7 @@ def ingest_alarm(alarm: AlarmCreate, session: SessionDep):
         # Update turbine state based on action
         if db_recommendation.action:
             RulesEngine.update_turbine_state(
-                turbine.id, db_recommendation.action, session
+                turbine.id, db_recommendation.action, db_alarm, session
             )
 
     return db_alarm

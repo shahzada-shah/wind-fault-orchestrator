@@ -10,6 +10,7 @@ from app.models import (
     AlarmStatus,
     RecommendationAction,
     RecommendationPriority,
+    TurbineState,
 )
 
 
@@ -26,7 +27,7 @@ class TurbineBase(BaseModel):
     capacity_kw: float = Field(..., gt=0, description="Capacity in kilowatts")
     installation_date: Optional[datetime] = None
     is_active: bool = True
-    state: str = Field(default="Online", description="Turbine state")
+    state: TurbineState = Field(default=TurbineState.ONLINE, description="Turbine operational state")
 
 
 class TurbineCreate(TurbineBase):
@@ -41,6 +42,7 @@ class TurbineUpdate(BaseModel):
     name: Optional[str] = Field(None, max_length=200)
     location: Optional[str] = Field(None, max_length=200)
     is_active: Optional[bool] = None
+    state: Optional[TurbineState] = Field(None, description="Manual state override")
 
 
 class TurbineResponse(TurbineBase):

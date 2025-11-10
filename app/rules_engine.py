@@ -12,6 +12,7 @@ from app.models import (
     Recommendation,
     RecommendationAction,
     RecommendationPriority,
+    TurbineState,
 )
 
 
@@ -452,14 +453,26 @@ class RulesEngine:
 
     @classmethod
     def update_turbine_state(
-        cls, turbine_id: int, action: RecommendationAction, session: Session
+        cls,
+        turbine_id: int,
+        action: RecommendationAction,
+        alarm: Alarm,
+        session: Session,
     ) -> None:
         """
-        Update turbine state based on recommendation action.
+        Update turbine state based on recommendation action and alarm details.
+
+        State Logic:
+        - ESCALATE → Repair (needs manual intervention)
+        - WAIT_COOL_DOWN → Available (temperature related, not performing optimally)
+        - RESET → Online (normal operation restored)
+        - SNOOZE → Stopped (temporary shutdown)
+        - MANUAL_INSPECTION → Impacted (Derated) (reduced performance)
 
         Args:
             turbine_id: Turbine database ID
             action: Recommended action
+            alarm: The alarm that triggered the action
             session: Database session
         """
         from app.models import Turbine
@@ -470,16 +483,27 @@ class RulesEngine:
 
         old_state = turbine.state
 
-        # Map actions to turbine states
+        # Map actions to turbine states based on real-world operations
         if action == RecommendationAction.ESCALATE:
-            turbine.state = "Faulted"
+            # Critical issues requiring repair
+            turbine.state = TurbineState.REPAIR
         elif action == RecommendationAction.WAIT_COOL_DOWN:
-            turbine.state = "Cooling"
+            # Temperature related, online but not performing
+            turbine.state = TurbineState.AVAILABLE
         elif action == RecommendationAction.RESET:
-            turbine.state = "Online"
+            # Normal operation restored
+            turbine.state = TurbineState.ONLINE
         elif action == RecommendationAction.SNOOZE:
-            turbine.state = "Stopped"
-        # MANUAL_INSPECTION keeps current state
+            # Manual stop or load shutdown
+            turbine.state = TurbineState.STOPPED
+        elif action == RecommendationAction.MANUAL_INSPECTION:
+            # Operating with reduced capacity
+            turbine.state = TurbineState.IMPACTED
+        
+        # Special case: Check for specific alarm codes that indicate derated operation
+        derated_codes = ["YAW_ERROR", "LOW_WIND_SPEED", "MINOR_VIBRATION"]
+        if alarm.alarm_code in derated_codes and action == RecommendationAction.RESET:
+            turbine.state = TurbineState.IMPACTED
 
         # Update timestamp if state changed
         if turbine.state != old_state:

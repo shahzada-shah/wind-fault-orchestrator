@@ -136,7 +136,7 @@ def generate_recommendation_for_alarm(alarm_id: int, session: SessionDep):
     # Update turbine state based on action
     if db_recommendation.action:
         RulesEngine.update_turbine_state(
-            alarm.turbine_db_id, db_recommendation.action, session
+            alarm.turbine_db_id, db_recommendation.action, alarm, session
         )
 
     return db_recommendation

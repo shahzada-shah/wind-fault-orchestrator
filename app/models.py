@@ -24,6 +24,17 @@ class AlarmStatus(str, Enum):
     RESOLVED = "resolved"
 
 
+class TurbineState(str, Enum):
+    """Turbine operational states."""
+
+    ONLINE = "Online"
+    IMPACTED = "Impacted (Derated)"
+    AVAILABLE = "Available"
+    STOPPED = "Stopped"
+    REPAIR = "Repair"
+    NETCOM = "Netcom"
+
+
 class RecommendationAction(str, Enum):
     """Recommendation action types."""
 
@@ -56,7 +67,7 @@ class Turbine(SQLModel, table=True):
     capacity_kw: float
     installation_date: Optional[datetime] = None
     is_active: bool = Field(default=True)
-    state: str = Field(default="Online", max_length=50)  # Online, Stopped, Faulted, Cooling
+    state: TurbineState = Field(default=TurbineState.ONLINE)
     last_state_change: Optional[datetime] = Field(default_factory=datetime.utcnow)
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)

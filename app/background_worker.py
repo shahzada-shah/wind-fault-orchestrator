@@ -105,7 +105,7 @@ class BackgroundWorker:
                         # Update turbine state if action changed
                         if new_recommendation.action:
                             RulesEngine.update_turbine_state(
-                                alarm.turbine_db_id, new_recommendation.action, session
+                                alarm.turbine_db_id, new_recommendation.action, alarm, session
                             )
 
                         # Mark old recommendation as superseded (by setting snooze_until to None)
